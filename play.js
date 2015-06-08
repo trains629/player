@@ -4,20 +4,30 @@ var http = require('http');
 var send = require('send');
 var url = require('url');
 var fs = require("fs");
+var wp = require("./webplayer");
 
 function Player(path,port) {
   this.path = path || __dirname;
   this.port = port || 8629;
   this.player = document.querySelector("#player");
+  this.files = {};
 }
 
 Player.prototype.bindPort = function (port) {
-  var self = this; 
-  var app = http.createServer(function(req, res){
-  console.log(url.parse(req.url).pathname);
-  send(req, url.parse(req.url).pathname, {root: './public'}).pipe(res);
+  var webplayer = wp.run(this,port);
+}
+
+Player.prototype.fileListGroup = function (path,fn) {
+  fs.readdir(path || this.path,function (err,files) {
+    console.log(err,files);
+    if(err)return;
+    var str = '<ul class="list-group">\n';
+    for (var i = 0; i < files.length; i++) {
+      str += '<li class="list-group-item">' + files[i] + '</li>\n'
+    }
+    str += '</ul>';
+    if(fn)fn(str,files);
   });
-  app.listen(port || this.port);
 }
 
 Player.prototype.initList = function (path) {
@@ -26,20 +36,12 @@ Player.prototype.initList = function (path) {
   if(!this.lister)return;
   // 在这里插入列表
   var self = this;
-  fs.readdir(path || this.path,function (err,files) {
-    console.log(err,files);
-    if(err)return;
-    console.log(files);
-    var str = '<ul class="list-group">\n';
-    for (var i = 0; i < files.length; i++) {
-      str += '<li class="list-group-item">' + files[i] + '</li>\n'
-    }
-    str += '</ul>';
+  this.fileListGroup(path,function (str,files) {
     console.log(str);
+    self.files = files;
     self.lister.innerHTML = str;
   });
 }
-//
 
 window.onload = function () {
   var player1 = new Player();
