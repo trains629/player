@@ -1,0 +1,19 @@
+doctype html
+html
+  heade
+    title title
+    link(href="./public/bootstrap.min.css",rel="stylesheet")
+    meta(charset="utf-8")
+    script(src="play.js")
+    style.
+      @media (max-width: 992px) {
+        .hideLister {
+          display:none;
+        }
+      }
+      
+  body
+    .container-fluid
+      .row
+        .hideLister.col-md-3#lister hello
+        video#player.col-xs-12.col-md-8(controls="true")

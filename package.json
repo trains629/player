@@ -1,0 +1,23 @@
+{
+  "name": "player",
+  "description": "play m4v with electron",
+  "main": "main.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/trains629/player.git"
+  },
+  "keywords": [
+    "m4v",
+    "player",
+    "electron"
+  ],
+  "author": "trains629",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/trains629/player/issues"
+  },
+  "homepage": "https://github.com/trains629/player#readme",
+  "dependencies": {
+    "send": "^0.12.3"
+  }
+}
