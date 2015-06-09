@@ -1,24 +1,13 @@
 //main.js
 var app = require("app");
 var BrowserWindow = require('browser-window');
-var ipc = require("ipc");
 var Menu = require('menu');
 var MenuItem = require('menu-item');
-
 var mainWindow = null;
 var menu = null;
 
-var client = null;
-
 app.on('window-all-closed', function() {
   app.quit();
-});
-console.log("dddddd");
-
-
-ipc.on("hello",function(event,arg) {
-  console.log("22",arg);
-  event.sender.send("hello-reply","2222");
 });
 
 var template = [
@@ -80,7 +69,6 @@ var template = [
 ];
 
 app.on("ready",function(argument) {
-  // body...
   mainWindow = new BrowserWindow({
     width: 800,
     height: 500,

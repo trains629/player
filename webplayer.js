@@ -5,38 +5,49 @@ var http = require('http');
 var send = require('send');
 var url = require('url');
 var fs = require("fs");
+var jade = require('jade');
 
 function webPlayer(player) { // 播放器对象
   this.player = player;
   this.path = player.path;
+  this.files = null;
+  var self = this;
+  fs.readdir(this.path,function (err,files) {
+      console.log(err,files);
+      if(err)return res.end("");
+      self.files = files;
+  });
+  // 输出模板
+  this.html = jade.compileFile(__dirname+'/template/playlist.jade');
+}
+
+webPlayer.prototype.queryPlay = function (uu,res) {
+  res.writeHead(200, {'Content-Type': 'text/json'});
+  var id = uu.query['id'];
+  console.log(uu.query);
+  var src = (id && this.files && id >0) ? this.path+'/'+this.files[id-1] : '';
+  var data = {"name":"hello"};
+  if(src != '')data['src'] = src;
+  return res.end(JSON.stringify(data));
 }
 
 webPlayer.prototype.fileList = function (req,res) {
-  // 显示文件列表,可以调用jade模板
-  var header = "<!DOCTYPE html>\n<html>\n<head>\n<link href=\"bootstrap.min.css\" rel=\"stylesheet\">\n<meta charset=\"utf-8\">\n<title>文件列表</title></head>\n";
+  // 处理操作命令
+  var uu = url.parse(req.url,true);
+  if(uu.pathname == '/cmd')return this.queryPlay(uu,res);
   res.writeHead(200, {'Content-Type': 'text/html'});
-  fs.readdir(path || this.path,function (err,files) {
-      console.log(err,files);
-      if(err)return res.end("");
-      var str = '<div class="list-group">\n';
-      for (var i = 0; i < files.length; i++) {
-        str += '<a href="#" class="list-group-item">' + files[i] + '</a>\n'
-      }
-      str += '</div>';
-      res.write(header);
-      res.write('<body>' + str + '</body></html>');
-      res.end();
-  });
+  console.log(uu);
+  if(!this.files)return res.end("error!");
+  res.write(this.html({"files":this.files}));
+  res.end();
 }
 
 webPlayer.prototype.run = function (port) {
   var self = this;
   var app = http.createServer(function(req, res){
-  console.log(req.url);
   function error(err) {
-      console.log(err);
-      // 在这里按参数返回需要的内容
-      self.fileList(req,res);
+    res.statusCode = err.status || 500;
+    res.end(err.message);
   }
   // your custom directory handling logic:
   function redirect() {
@@ -45,7 +56,12 @@ webPlayer.prototype.run = function (port) {
     res.setHeader('Location', req.url + '/');
     res.end('Redirecting to ' + req.url + '/');
   }
-  send(req, url.parse(req.url).pathname, {root: __dirname + '/public'})
+  var pathname = url.parse(req.url).pathname;
+  console.log(pathname);
+  if(pathname == '/' || pathname == '/cmd'){
+    return self.fileList(req,res);
+  }
+  send(req, pathname, {root: __dirname + '/public'})
   .on("error",error)
   .on('directory', redirect)
   .pipe(res);

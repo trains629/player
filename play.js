@@ -30,6 +30,18 @@ Player.prototype.fileListGroup = function (path,fn) {
   });
 }
 
+// 控制播放
+Player.prototype.play = function (path) {
+  if (path) {
+    this.player.src = path;
+  }
+  this.player.play();
+}
+
+Player.prototype.info = function () {
+  return [];
+}
+
 Player.prototype.initList = function (path) {
   this.lister = document.querySelector("#lister");
   console.log(this.lister);
