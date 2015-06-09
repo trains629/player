@@ -1,17 +1,17 @@
 //client.js
 
-var info;
+var infor;
 
 window.onload = function () {
-  info = document.querySelector("#info");
+  infor = document.querySelector("#infor");
 }
 
 function player(id) {
   // 那需要一个处理ajax的函数库
   console.log(id);
   $.get("cmd?id="+id,function (data) {
-    console.log(data);
-    if(!info)return;
-    info.innerHTML = JSON.stringify(data);
+    console.log(data,infor);
+    if(!infor)return;
+    infor.innerHTML = JSON.stringify(data);
   })
 }
